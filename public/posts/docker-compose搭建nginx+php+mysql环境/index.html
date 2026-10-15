@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="auto" data-theme="auto">
+<html lang="zh" dir="auto" data-theme="auto">
 
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/docker-compose%E6%90%AD%E5%BB%BAnginx&#43;php&#43;mysql%E7%8E%AF%E5%A2%83/">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/docker-compose%E6%90%AD%E5%BB%BAnginx&#43;php&#43;mysql%E7%8E%AF%E5%A2%83/">
 <noscript>
     <style>
         #theme-toggle,
@@ -68,7 +68,7 @@
   <meta property="og:site_name" content="xijiangzhu&#39;s Blog">
   <meta property="og:title" content="Docker Compose搭建Nginx&#43;PHP&#43;MySQL环境">
   <meta property="og:description" content="使用 Docker Compose 编排 Nginx、PHP-FPM 和 MySQL 三个容器,包括镜像选择、Dockerfile、目录结构、compose 配置、启动停止以及 PHP 连接 MySQL 的验证。">
-  <meta property="og:locale" content="zh_cn">
+  <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2026-10-12T10:00:00+00:00">
@@ -116,7 +116,7 @@
   ],
   "articleBody": "本文通过一个 demo,使用 Docker Compose 一键编排 Nginx + PHP-FPM + MySQL 三个容器,搭建一套常见的 PHP 运行环境,并验证 PHP 能够连接 MySQL。\n版本说明:本文基于较早的版本编写(Compose 1.19.0、PHP 7.2、MySQL 5.7),这些版本都已停止维护。思路和写法仍然适用,实际使用时建议换成较新的镜像版本,文末「使用提示」里有具体说明。\n一、镜像选择 1. Nginx nginx 官方镜像使用 latest tag。\n2. PHP PHP 版本较多,可以在 PHP 官方镜像中选一个 tag。本文使用 7.2-fpm(作者使用 latest 无法正常启动)。\nPHP 的 Dockerfile\n要让 PHP 连接 MySQL,需要在 Docker 官方的 PHP 镜像上额外安装 mysqli 扩展,所以用 Dockerfile 构建一个新镜像。\n新建 php-mysqli 目录:\nmkdir php-mysqli cd php-mysqli vi Dockerfile 编辑 Dockerfile,内容如下:\nFROM php:7.2-fpm RUN apt-get update \\ \u0026\u0026 docker-php-ext-install mysqli FROM php:7.2-fpm:表示基于 php:7.2-fpm 镜像。 RUN 后面的指令:在构建镜像时执行,用来安装扩展。 这里不需要手动 build 镜像,后面使用 docker-compose 时会自动构建。\n关于 Dockerfile,可以参考 《Docker — 从入门到实践》——使用 Dockerfile 定制镜像。\n3. MySQL MySQL 官方镜像,本文选择 5.7 tag。\n二、安装 Docker Compose 可参考官方文档。\n1. 下载(本文使用 1.19.0)\nsudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose 可以到 Compose GitHub 查看所有发布版本。\n2. 设置执行权限\nsudo chmod +x /usr/local/bin/docker-compose 3. 测试是否安装成功\ndocker-compose --version 输出示例:\ndocker-compose version 1.19.0, build 1719ceb 三、构建目录结构 新建如下目录结构:\nphp-nginx-compose/ ├── conf.d │ └── default.conf ├── docker-compose.yml ├── html │ └── index.php └── php-mysqli └── Dockerfile 其中 php-mysqli 就是上面创建的目录,直接放在 php-nginx-compose 目录中。\n1. docker-compose.yml version: '3' services: nginx: image: nginx:latest # 端口映射 ports: - \"80:80\" # 依赖关系:先启动 php depends_on: - \"php\" # 数据卷 volumes: # 映射主机 ./conf.d 目录到容器 /etc/nginx/conf.d 目录 - \"$PWD/conf.d:/etc/nginx/conf.d\" - \"$PWD/html:/usr/share/nginx/html\" networks: - app_net # 容器名称 container_name: \"compose-nginx\" php: build: ./php-mysqli # image 指定 build 生成镜像的名称,名字可以自定义 image: php:7.2-fpm-mysqli ports: - \"9000:9000\" volumes: - \"$PWD/html:/usr/share/nginx/html\" networks: - app_net container_name: \"compose-php\" mysql: image: mysql:5.7 ports: - \"3306:3306\" # 环境变量 environment: # MySQL root 密码,换成你自己的密码 - MYSQL_ROOT_PASSWORD=你的密码 networks: app_net: # 固定子网 IP,必须在下面配置的子网 10.10.*.* 范围内 ipv4_address: 10.10.10.1 container_name: \"compose-mysql\" networks: # 配置 docker network app_net: driver: bridge ipam: config: # 子网 - subnet: 10.10.0.0/16 关于 Compose file 的配置,可以看官方详细说明。网上还有一篇中文说明《如何写 docker-compose.yml,Docker compose file 参考文档》。建议先看官方文档,看不懂再找翻译。\n2. conf.d/default.conf server { listen 80; server_name localhost; root /usr/share/nginx/html; index index.html index.htm index.php; location ~ \\.php$ { fastcgi_pass php:9000; fastcgi_index index.php; fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; include fastcgi_params; } } fastcgi_pass php:9000 中的 php 就是 docker-compose.yml 里的服务名,同一个网络内的容器可以直接用服务名互相访问。\n3. html/index.php \u003c?php phpinfo(); 四、启动服务 在 php-nginx-compose 目录下执行:\ndocker-compose up -d 输出示例:\nCreating compose-php ... done Creating compose-nginx ... done Creating compose-mysql ... Creating compose-nginx ... 查看是否启动成功:\ndocker ps 输出示例:\nCONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES aeb1f626516b nginx:latest \"nginx -g 'daemon of…\" 5 seconds ago Up 3 seconds 0.0.0.0:80-\u003e80/tcp compose-nginx 4e681d94c146 php:7.2-fpm-mysqli \"docker-php-entrypoi…\" 7 seconds ago Up 5 seconds 0.0.0.0:9000-\u003e9000/tcp compose-php fcdf6ac20bac mysql:5.7 \"docker-entrypoint.s…\" 7 seconds ago Up 5 seconds 0.0.0.0:3306-\u003e3306/tcp compose-mysql nginx、php、mysql 三个容器都启动了。如果没有全部启动,可以再执行一次 docker-compose up -d;如果还是不成功,就排查一下配置是否有误。\n验证:浏览器访问 http://服务器IP/index.php,如果看到 PHP 的 phpinfo() 信息页面,说明 nginx 与 php 容器已经关联成功。\n也可以用 Navicat 等数据库工具连接 MySQL:账号 root,密码是 MYSQL_ROOT_PASSWORD 环境变量的值,端口 3306。\n五、停止与重启服务 停止服务有两种方式:\n1. 使用 docker-compose 停止 docker-compose stop 输出示例:\nStopping compose-nginx ... done Stopping compose-php ... done Stopping compose-mysql ... done 2. 使用 docker 命令停止 docker stop 容器名/容器ID 3. 重启服务 直接执行下面的命令即可。即使只停止了部分容器,它也会把没有启动的容器重新启动:\ndocker-compose up -d 六、PHP 连接 MySQL 在 php-nginx-compose/html/ 目录下新建 connect_mysql.php:\n\u003c?php // mysqli_connect 参数:主机、账号、密码、数据库、端口 $link = mysqli_connect(\"10.10.10.1\", \"root\", \"你的密码\", \"mysql\", 3306); if (!$link) { echo \"Error: Unable to connect to MySQL.\" . PHP_EOL . \"\"; echo \"Debugging errno: \" . mysqli_connect_errno() . PHP_EOL . \"\"; echo \"Debugging error: \" . mysqli_connect_error() . PHP_EOL . \"\"; exit; } echo \"Success: A proper connection to MySQL was made! The my_db database is great.\" . PHP_EOL . \"\"; echo \"Host information: \" . mysqli_get_host_info($link) . PHP_EOL; mysqli_close($link); ?\u003e 这里的 IP 就是 docker-compose.yml 中配置的子网 IP ipv4_address: 10.10.10.1。因为三个容器在同一个网络里,也可以直接把主机写成服务名 mysql。mysqli_connect 的用法可以参考 PHP 官方文档。\n验证:浏览器访问 http://服务器IP/connect_mysql.php,如果页面输出 Success: A proper connection to MySQL was made! 以及 Host information: 10.10.10.1 via TCP/IP,说明连接 MySQL 成功。\n七、使用提示 Compose 版本:新版 Docker 已把 Compose 做成内置插件,命令是 docker compose(中间是空格,不是连字符),安装 Docker 时通常已经自带,不需要再单独下载 docker-compose。旧的 docker-compose 命令(v1)已停止维护。 version 字段:新版 Compose 中顶层的 version: '3' 已经是过时字段,可以删掉,保留也不会影响使用。 镜像版本:PHP 7.2、MySQL 5.7 均已停止维护,新项目建议换成较新的稳定版本,并注意 MySQL 8 默认使用 caching_sha2_password 认证,老的客户端或 PHP 版本可能需要额外配置。 不要暴露不必要的端口:示例中把 PHP-FPM 的 9000 和 MySQL 的 3306 映射到了宿主机,仅用于方便调试。生产环境中,同一网络内的容器之间可以直接互访,不需要映射这两个端口,尤其不要把 3306 暴露到公网。 数据持久化:示例没有给 MySQL 配置数据卷,删除容器后数据会丢失。实际使用时,请给 MySQL 增加数据卷,例如 - \"$PWD/mysql-data:/var/lib/mysql\"。 密码安全:MYSQL_ROOT_PASSWORD 不要使用弱密码,也不要把真实密码提交到公开仓库,可以改用 .env 文件或 Docker secrets。 ",
   "wordCount" : "599",
-  "inLanguage": "en",
+  "inLanguage": "zh",
   "datePublished": "2026-10-12T10:00:00Z",
   "dateModified": "2026-10-12T10:00:00Z",
   "mainEntityOfPage": {
@@ -164,8 +164,8 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/" title="首页">
-                    <span>首页</span>
+                <a href="http://localhost:1313/" title="主页">
+                    <span>主页</span>
                 </a>
             </li>
             <li>
@@ -206,7 +206,7 @@
 <article class="post-single">
   <header class="post-header">
     <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-            <a href="/">Home</a>
+            <a href="/">主页</a>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -225,7 +225,7 @@
     </div>
     <div class="post-meta">
 
-<span title='2026-10-12 10:00:00 +0000 UTC'>October 12, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+<span title='2026-10-12 10:00:00 +0000 UTC'>2026年10月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -733,12 +733,12 @@
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerHTML = 'copy';
+        copybutton.innerHTML = '复制';
 
         function copyingDone() {
-            copybutton.innerHTML = 'copied!';
+            copybutton.innerHTML = '已复制！';
             setTimeout(() => {
-                copybutton.innerHTML = 'copy';
+                copybutton.innerHTML = '复制';
             }, 2000);
         }
 

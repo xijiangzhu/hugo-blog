@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="auto" data-theme="auto">
+<html lang="zh" dir="auto" data-theme="auto">
 
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/percona-toolkit%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/percona-toolkit%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%95%B4%E7%90%86/">
 <noscript>
     <style>
         #theme-toggle,
@@ -68,7 +68,7 @@
   <meta property="og:site_name" content="xijiangzhu&#39;s Blog">
   <meta property="og:title" content="Percona Toolkit 常用命令整理">
   <meta property="og:description" content="整理 Percona Toolkit 中常用的工具用法:在线改表、主从数据校验与修复、数据归档、慢查询杀死与分析、重复索引检查。">
-  <meta property="og:locale" content="zh_cn">
+  <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2026-10-12T10:00:00+00:00">
@@ -114,7 +114,7 @@
   ],
   "articleBody": "Percona Toolkit(简称 pt 工具集)是一组用于 MySQL 运维的命令行工具,可以在线修改表结构、校验和修复主从数据、归档数据、分析慢日志等。本文整理其中最常用的几个工具的典型用法。\n零、基础知识 1. 安装 # CentOS / RHEL(需先配置 Percona 的 yum 源) yum install percona-toolkit # Ubuntu / Debian apt install percona-toolkit 也可以从 Percona 官网下载安装包或二进制压缩包。\n2. DSN 连接串 很多工具用 DSN(Data Source Name)来指定数据库、表或服务器,格式是逗号分隔的 键=值:\n键 含义 h 主机 P 端口 u 用户 p 密码 D 数据库 t 表 例如:h=127.0.0.1,P=3306,u=root,D=test,t=t1。\n3. 通用选项 选项 说明 --ask-pass 运行时提示输入密码,避免在命令行明文写密码 --charset 指定连接字符集 --dry-run 试运行,不真正执行修改 --print 打印将要执行的语句 --execute 真正执行 使用原则:有 --dry-run、--print 的工具,先试运行并检查输出,确认无误后再改用 --execute。生产环境操作前先备份数据。\n一、pt-online-schema-change(在线修改表结构) 在不长时间锁表的情况下修改表结构。原理是创建一张结构修改后的新表,把数据分批拷贝过去,用触发器同步拷贝期间的增量,最后原子地替换表名。\n1. 示例命令 pt-online-schema-change -h 127.0.0.1 -u root -P 3306 D=test,t=t1 \\ --ask-pass \\ --alter=\"ADD COLUMN name varchar(16) NOT NULL DEFAULT '' COMMENT '名字'\" \\ --alter-foreign-keys-method=auto \\ --no-drop-old-table \\ --charset=utf8 \\ --max-load=Threads_running=25 \\ --recursion-method=dsn=D=test,t=dsns \\ --max-lag=30 \\ --no-check-replication-filters \\ --dry-run --print 确认无误后,把最后一行的 --dry-run --print 换成 --execute 正式执行。\n2. 参数说明 参数 说明 D=test,t=t1 要修改的数据库和表 --alter 要执行的修改内容(不需要写 ALTER TABLE 表名) --alter-foreign-keys-method=auto 处理外键引用的方式,auto 让工具自动选择合适的方法 --no-drop-old-table 改表完成后不删除旧表(旧表会被改名保留,方便回退) --max-load=Threads_running=25 当 Threads_running 超过 25 时暂停拷贝数据,降低对线上的影响 --max-lag=30 从库延迟超过 30 秒时暂停拷贝数据 --recursion-method=dsn=D=test,t=dsns 从 test.dsns 表中读取从库信息,用于检查延迟 --no-check-replication-filters 不检查复制过滤规则 --dry-run 试运行:创建并修改新表结构,但不拷贝数据、不替换原表 --execute 正式执行 --dry-run 和 --execute 必须二选一。\n3. dsns 表的创建 --recursion-method=dsn=... 指定的表需要提前创建,并写入从库的连接信息:\nCREATE TABLE test.dsns ( id int(11) NOT NULL AUTO_INCREMENT, parent_id int(11) DEFAULT NULL, dsn varchar(255) NOT NULL, PRIMARY KEY (id) ); INSERT INTO test.dsns (dsn) VALUES ('h=192.168.1.2,P=3306,u=root'); 二、pt-table-checksum 与 pt-table-sync(主从数据校验与修复) 两个工具配合使用:先用 pt-table-checksum 在主库上发现主从数据不一致,再用 pt-table-sync 修复。\n1. 校验数据一致性 在主库上执行:\npt-table-checksum \\ --nocheck-replication-filters \\ --no-check-binlog-format \\ --replicate=test.checksums \\ --recursion-method=dsn=D=test,t=dsns \\ --databases=test h=127.0.0.1,u=root,P=3306 \\ --ask-pass 参数 说明 --nocheck-replication-filters 不检查复制过滤规则 --no-check-binlog-format 不检查 binlog 格式(默认要求为 STATEMENT,否则会报错) --replicate=test.checksums 把校验结果保存到 test.checksums 表,会通过复制同步到从库 --recursion-method=dsn=... 从 dsns 表获取从库列表 --databases=test 只校验 test 库 h=127.0.0.1,u=root,P=3306 主库的连接信息 结果中的 DIFFS 列大于 0,表示该表主从数据存在差异。\n2. 修复数据不一致 pt-table-sync \\ --replicate=test.checksums \\ --sync-to-master h=127.0.0.1,P=3307,u=root \\ --ask-pass \\ --print 参数 说明 --replicate=test.checksums 根据校验结果表,只同步有差异的数据块 --sync-to-master 把后面的 DSN 当作从库,让它和自己的主库保持一致 h=127.0.0.1,P=3307,u=root 要修复的从库连接信息 --print 只打印将要执行的修复语句,不真正执行 务必先用 --print 检查输出的语句,确认无误后,再换成 --execute 执行。\n三、pt-archiver(数据归档) 按条件把一张表的数据归档到另一张表或文件中,可选择是否删除源数据,分批执行,对线上影响较小。\n原笔记标题写的是 pt-archive,实际命令是 pt-archiver。\npt-archiver \\ --source h=127.0.0.1,P=3306,u=root,D=test,t=t1 \\ --dest h=127.0.0.1,P=3306,u=root,D=test,t=t2 \\ --ask-pass \\ --where \"id\u003c5000\" \\ --charset=utf8 \\ --no-check-charset \\ --bulk-insert \\ --progress 10000 \\ --limit 10000 \\ --no-delete \\ --statistics 参数 说明 --source 源表连接信息 --dest 目标表连接信息 --where \"id\u003c5000\" 归档的条件,这里是 id 小于 5000 的数据 --charset=utf8 连接字符集 --no-check-charset 不检查源表和目标表的字符集是否一致 --bulk-insert 批量插入到目标表(使用 LOAD DATA LOCAL INFILE),速度更快 --progress 10000 每处理 10000 行输出一次进度 --limit 10000 每次批量取 10000 行 --no-delete 不删除源表数据,只复制 --statistics 结束时输出统计信息(耗时、行数等) 去掉 --no-delete,工具会在归档后删除源表中已归档的数据,请确认后再使用。只想删除数据而不归档,可使用 --purge。\n四、pt-kill(杀死符合条件的查询) 按条件自动杀死长时间运行的查询或连接。\npt-kill \\ --host=127.0.0.1 \\ --user=root \\ --port=3306 \\ --ask-pass \\ --match-info \"SELECT|select\" \\ --busy-time=100 \\ --victim all \\ --interval 5 \\ --kill \\ --print 参数 说明 --match-info \"SELECT|select\" 匹配查询语句内容符合该正则的连接(这里是含 SELECT 的语句) --busy-time=100 只匹配已经运行了 100 秒以上的查询 --victim all 匹配到的所有查询都杀死(默认只杀最久的一个) --interval 5 每 5 秒检查一次 --kill 真正杀死匹配到的连接 --print 打印被杀死的查询 这个命令会真正杀死连接,先去掉 --kill、只保留 --print 观察会匹配到哪些语句,确认无误后再加上 --kill。持续运行时可以配合 --daemonize 放到后台。\n五、pt-query-digest(慢查询日志分析) 分析慢查询日志,汇总出最耗时、最频繁的 SQL。原笔记只记录了按时间范围过滤的两个参数:\npt-query-digest \\ --since \"yyyy-mm-dd hh:mm:ss\" \\ --until \"yyyy-mm-dd hh:mm:ss\" \\ /var/lib/mysql/slow.log 参数 说明 --since 只分析该时间之后的记录 --until 只分析该时间之前的记录 命令末尾要指定慢查询日志文件(路径按实际环境替换,可用 show variables like 'slow_query_log_file'; 查看)。结果较长时,可以重定向保存:... slow.log \u003e report.txt。\n六、pt-duplicate-key-checker(重复索引检查) 检查表中重复或冗余的索引和外键。\npt-duplicate-key-checker \\ --host=127.0.0.1 \\ --user=root \\ --port=3306 \\ --ask-pass \\ --databases=test \\ --tables=t1 参数 说明 --databases=test 指定检查的数据库 --tables=t1 指定检查的表(不写则检查整个库) 输出结果会列出重复的索引,并给出对应的 ALTER TABLE ... DROP INDEX ... 建议语句。\n七、使用提示 先试运行再执行:--dry-run、--print 看过没问题,再用 --execute、--kill 等真正生效的参数。 密码不要写在命令行:使用 --ask-pass 交互输入,避免密码留在 shell 历史里。 选项在命令中可以任意换行:本文用 \\ 把长命令分行书写,实际执行时也可以写成一行。 注意版本:不同版本的 Percona Toolkit 和 MySQL 版本之间,个别参数行为有差异,以 pt-xxx --help 的输出为准。 控制对线上的影响:改表、归档时,配合 --max-load、--max-lag、--limit 等参数,避免拖慢业务。 ",
   "wordCount" : "484",
-  "inLanguage": "en",
+  "inLanguage": "zh",
   "datePublished": "2026-10-12T10:00:00Z",
   "dateModified": "2026-10-12T10:00:00Z",
   "mainEntityOfPage": {
@@ -162,8 +162,8 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/" title="首页">
-                    <span>首页</span>
+                <a href="http://localhost:1313/" title="主页">
+                    <span>主页</span>
                 </a>
             </li>
             <li>
@@ -204,7 +204,7 @@
 <article class="post-single">
   <header class="post-header">
     <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-            <a href="/">Home</a>
+            <a href="/">主页</a>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -223,7 +223,7 @@
     </div>
     <div class="post-meta">
 
-<span title='2026-10-12 10:00:00 +0000 UTC'>October 12, 2026</span>&nbsp;·&nbsp;<span>3 min</span>
+<span title='2026-10-12 10:00:00 +0000 UTC'>2026年10月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -970,12 +970,12 @@
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerHTML = 'copy';
+        copybutton.innerHTML = '复制';
 
         function copyingDone() {
-            copybutton.innerHTML = 'copied!';
+            copybutton.innerHTML = '已复制！';
             setTimeout(() => {
-                copybutton.innerHTML = 'copy';
+                copybutton.innerHTML = '复制';
             }, 2000);
         }
 

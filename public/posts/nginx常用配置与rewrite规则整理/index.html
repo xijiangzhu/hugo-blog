@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="auto" data-theme="auto">
+<html lang="zh" dir="auto" data-theme="auto">
 
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E4%B8%8Erewrite%E8%A7%84%E5%88%99%E6%95%B4%E7%90%86/">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/nginx%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E4%B8%8Erewrite%E8%A7%84%E5%88%99%E6%95%B4%E7%90%86/">
 <noscript>
     <style>
         #theme-toggle,
@@ -68,7 +68,7 @@
   <meta property="og:site_name" content="xijiangzhu&#39;s Blog">
   <meta property="og:title" content="Nginx常用配置与Rewrite规则整理">
   <meta property="og:description" content="整理 Nginx 常用的正则匹配、rewrite 指令、全局变量,以及防盗链、域名跳转、HTTPS 跳转等常见配置实例。">
-  <meta property="og:locale" content="zh_cn">
+  <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2026-10-12T10:00:00+00:00">
@@ -114,7 +114,7 @@
   ],
   "articleBody": "本文整理 Nginx 日常配置中最常用的内容:正则匹配符、文件判断、rewrite 指令与 flag、常见规则实例、全局变量,以及与 Apache 规则的对应关系。\n一、正则表达式匹配 符号 含义 ~ 区分大小写匹配 ~* 不区分大小写匹配 !~ 区分大小写不匹配 !~* 不区分大小写不匹配 二、文件及目录匹配 符号 含义 -f / !-f 判断文件是否存在 / 不存在 -d / !-d 判断目录是否存在 / 不存在 -e / !-e 判断文件或目录是否存在 / 不存在 -x / !-x 判断文件是否可执行 / 不可执行 三、rewrite 指令的 flag 标记 rewrite 指令的最后一个参数是 flag 标记,常用的有四种:\nflag 说明 last 相当于 Apache 里的 [L] 标记,表示本条规则执行完后,用重写后的 URI 重新发起请求(重新匹配 server{} 中的 location) break 本条规则匹配完成后,终止匹配,不再匹配后面的规则 redirect 返回 302 临时重定向,浏览器地址栏会显示跳转后的 URL permanent 返回 301 永久重定向,浏览器地址栏会显示跳转后的 URL 使用 last 和 break 实现 URI 重写时,浏览器地址栏不变,但两者有细微差别:\n使用 alias 指令时,必须用 last 标记。 使用 proxy_pass 指令时,需要用 break 标记。 last 在本条 rewrite 规则执行完毕后,会对其所在的 server{...} 重新发起请求;break 则在本条规则匹配完成后直接终止匹配。 例如,将 /photo/123456 重定向到 /path/to/photo/12/1234/123456.png:\nrewrite \"/photo/([0-9]{2})([0-9]{2})([0-9]{2})\" /path/to/photo/$1/$1$2/$1$2$3.png; 四、Rewrite 规则相关指令 1. break 指令 使用环境:server、location、if 作用:完成当前的规则集,不再处理后续的 rewrite 指令。 2. if 指令 使用环境:server、location 作用:检查条件是否成立,成立则执行大括号内的语句。 注意:if 指令不支持嵌套,也不支持多个条件的 \u0026\u0026 和 || 处理。\n3. return 指令 语法:return code; 使用环境:server、location、if 作用:结束规则的执行,并返回状态码给客户端。 示例:访问的 URL 以 .sh 或 .bash 结尾时,返回 403:\nlocation ~ .*\\.(sh|bash)?$ { return 403; } 4. rewrite 指令 语法:rewrite regex replacement flag; 使用环境:server、location、if 作用:根据正则表达式重定向 URI 或修改字符串,指令按配置文件中的顺序执行。 注意:重写表达式只对相对路径有效。如果要匹配主机名,应使用 if 语句,示例:\nif ($host ~* www\\.(.*)) { set $host_without_www $1; rewrite ^(.*)$ http://$host_without_www$1 permanent; } 5. set 指令 语法:set $variable value; 默认值:无 使用环境:server、location、if 作用:定义一个变量并赋值。变量的值可以是文本、变量,或两者的组合。 示例:\nset $varname \"hello world\"; 6. uninitialized_variable_warn 指令 语法:uninitialized_variable_warn on|off; 使用环境:http、server、location、if 作用:开启或关闭未初始化变量的警告信息,默认开启。 五、Rewrite 规则编写实例 1. 文件或目录不存在时,重定向到某个 php 文件 if (!-e $request_filename) { rewrite ^/(.*)$ /index.php last; } 2. 目录对换 /123456/xxxx 变为 /xxxx?id=123456:\nrewrite ^/(\\d+)/(.+)/ /$2?id=$1 last; 3. IE 浏览器重定向到 /ie 目录 if ($http_user_agent ~ MSIE) { rewrite ^(.*)$ /ie/$1 break; } 4. 禁止访问多个目录 location ~ ^/(cron|templates)/ { deny all; break; } 5. 禁止访问以 /data 开头的文件 location ~ ^/data { deny all; } 6. 禁止访问 .sh、.flv、.mp3 后缀的文件 location ~ .*\\.(sh|flv|mp3)$ { return 403; } 7. 设置某些类型文件的浏览器缓存时间 location ~ .*\\.(gif|jpg|jpeg|png|bmp|swf)$ { expires 30d; } location ~ .*\\.(js|css)$ { expires 1h; } 8. 给 favicon.ico 和 robots.txt 设置过期时间 favicon.ico 缓存 99 天,robots.txt 缓存 7 天,并且不记录 404 错误日志:\nlocation ~ (favicon.ico) { log_not_found off; expires 99d; break; } location ~ (robots.txt) { log_not_found off; expires 7d; break; } 9. 设定某个文件的过期时间 这里设为 600 秒,并且不记录访问日志:\nlocation ^~ /html/scripts/loadhead_1.js { access_log off; root /opt/lampp/htdocs/web; expires 600; break; } 10. 文件防盗链并设置过期时间 说明:\nreturn 412:自定义 HTTP 状态码(默认是 403),方便找出真正的盗链请求。 rewrite ^/ http://img.linuxidc.net/leech.gif;:显示一张防盗链提示图片。 access_log off;:不记录访问日志,减轻压力。 expires 3d;:所有文件设置 3 天的浏览器缓存。 location ~* ^.+\\.(jpg|jpeg|gif|png|swf|rar|zip|css|js)$ { valid_referers none blocked *.linuxidc.com *.linuxidc.net localhost 208.97.167.194; if ($invalid_referer) { rewrite ^/ http://img.linuxidc.net/leech.gif; return 412; break; } access_log off; root /opt/lampp/htdocs/web; expires 3d; break; } 11. 只允许固定 IP 访问网站,并加上密码 root /opt/htdocs/www; allow 208.97.167.194; allow 222.33.1.2; allow 231.152.49.4; deny all; auth_basic \"C1G_ADMIN\"; auth_basic_user_file htpasswd; 12. 将多级目录下的文件转成一个文件,增强 SEO 效果 /job-123-456-789.html 指向 /job/123/456/789.html:\nrewrite ^/job-([0-9]+)-([0-9]+)-([0-9]+)\\.html$ /job/$1/$2/jobshow_$3.html last; 13. 文件和目录不存在时,转发到后端 if (!-e $request_filename) { proxy_pass http://127.0.0.1; } 14. 将根目录下某个文件夹指向二级目录 需求:/shanghaijob/ 指向 /area/shanghai/。\nrewrite ^/([0-9a-z]+)job/(.*)$ /area/$1/$2 last; 如果把 last 改成 permanent,浏览器地址栏会显示 /area/shanghai/。\n问题一:上面的写法在访问 /shanghaijob(末尾没有斜杠)时不会匹配。补充一条规则:\nrewrite ^/([0-9a-z]+)job$ /area/$1/ last; rewrite ^/([0-9a-z]+)job/(.*)$ /area/$1/$2 last; 这样 /shanghaijob 也能访问了。\n问题二:页面中的相对链接会失效。例如 ./list_1.html 的真实地址是 /area/shanghai/list_1.html,但因为地址栏仍是 /shanghaijob,浏览器会把它解析成 /list_1.html,导致无法访问。\n想用下面的 -d 判断来自动补斜杠跳转,也行不通:\nif (-d $request_filename) { rewrite ^/(.*)([^/])$ http://$host/$1$2/ permanent; } 原因是 -d 要求 $request_filename 必须是真实存在的目录,而这里的路径是 rewrite 出来的虚拟路径,条件不会为真。\n解决方法:手动写一条跳转规则,补上末尾斜杠:\nrewrite ^/([0-9a-z]+)job$ /$1job/ permanent; rewrite ^/([0-9a-z]+)job/(.*)$ /area/$1/$2 last; 15. 域名跳转 server { listen 80; server_name jump.linuxidc.com; index index.html index.htm index.php; root /opt/lampp/htdocs/www; rewrite ^/ http://www.linuxidc.com/; access_log off; } 16. 多域名转向 server_name www.linuxidc.com www.linuxidc.net; index index.html index.htm index.php; root /opt/lampp/htdocs; if ($host ~ \"linuxidc\\.net\") { rewrite ^(.*) http://www.linuxidc.com$1 permanent; } 17. 80 端口转 443 原笔记中的写法如下,但它是把非 80 端口的请求跳转回 http,并不能实现跳转到 HTTPS:\n# 原写法(有误,仅供对照) if ($server_port != '80') { rewrite ^/(.*)$ http://$host/$1 permanent; } 正确的 80 转 443 写法见文末「HTTP 强制跳转到 HTTPS」一节。\n六、Nginx 全局变量 变量 说明 $arg_PARAMETER GET 请求中参数 PARAMETER 的值 $args 请求行中(GET 请求)的参数,如 foo=123\u0026bar=blahblah $binary_remote_addr 二进制格式的客户端地址 $body_bytes_sent 响应时送出的 body 字节数,即使连接中断,这个数据也是精确的 $content_length 请求头中的 Content-Length 字段 $content_type 请求头中的 Content-Type 字段 $cookie_COOKIE Cookie 变量 COOKIE 的值 $document_root 当前请求在 root 指令中指定的值 $document_uri 与 $uri 相同 $host 请求的主机头字段,否则为服务器名称 $hostname 机器的主机名,即 gethostname 的返回值 $http_HEADER 任意请求头的值,如 $http_user_agent $is_args 有 $args 参数时为 ?,否则为空 $http_user_agent 客户端 agent 信息 $http_cookie 客户端 cookie 信息 $limit_rate 可用于限制连接速率 $query_string 与 $args 相同 $request_body_file 客户端请求主体信息的临时文件名 $request_method 客户端请求的动作,通常为 GET 或 POST $remote_addr 客户端的 IP 地址 $remote_port 客户端的端口 $remote_user 经过 Auth Basic 模块验证的用户名 $request_completion 请求结束时设置为 OK;请求未结束,或不是请求链的最后一个时为空 $request_filename 当前请求的文件路径,由 root 或 alias 指令与 URI 生成 $request_uri 包含请求参数的原始 URI,不含主机名,如 /foo/bar.php?arg=baz,不能修改 $scheme 请求使用的协议,如 http、https $server_protocol 请求使用的协议版本,通常是 HTTP/1.0 或 HTTP/1.1 $server_addr 服务器地址,在完成一次系统调用后可以确定这个值 $server_name 服务器名称 $server_port 请求到达服务器的端口号 七、Apache 和 Nginx 规则的对应关系 Apache Nginx RewriteCond if RewriteRule rewrite [R] redirect [P] last [R,L] redirect [P,L] last [PT,L] last 示例:只允许指定域名访问,其他域名一律转向 www.linuxidc.net Apache:\nRewriteCond %{HTTP_HOST} !^(.*?)\\.aaa\\.com$ [NC] RewriteCond %{HTTP_HOST} !^localhost$ RewriteCond %{HTTP_HOST} !^192\\.168\\.0\\.(.*?)$ RewriteRule ^/(.*)$ http://www.linuxidc.net [R,L] Nginx:\nif ($host ~* ^(.*)\\.aaa\\.com$) { set $allowHost '1'; } if ($host ~* ^localhost) { set $allowHost '1'; } if ($host ~* ^192\\.168\\.1\\.(.*?)$) { set $allowHost '1'; } if ($allowHost !~ '1') { rewrite ^/(.*)$ http://www.linuxidc.net redirect; } 示例:所有页面都显示同一张图片 rewrite ^(.*)$ /1/1.png break; 示例:访问的链接不存在时,重定向到某个页面 location / { if (!-f $request_filename) { rewrite ^/(.+)$ /1/1.png last; } } 示例:不带 www 跳转到带 www 的域名 在 server{} 里添加:\nif ($host != 'www.test.com') { rewrite ^/(.*)$ http://www.test.com/$1 permanent; } 示例:禁止 IE 访问 location / { if ($http_user_agent ~ MSIE) { return 503; } } 示例:防盗链 location ~* \\.(gif|jpg|png|bmp)$ { valid_referers none blocked *.baidu.com server_names ~\\.google\\. ~\\.baidu\\.; if ($invalid_referer) { return 403; #rewrite ^/ http://www.ttlsa.com/403.jpg; } } 八、HTTP 跳转到 HTTPS Apache 把下面三句规则放到 VirtualHost 的 80 端口配置里,即可实现所有 HTTP 请求跳转到 HTTPS:\nRewriteEngine on RewriteCond %{SERVER_PORT} !^443$ RewriteRule ^(.*)?$ https://%{SERVER_NAME}$1 [L,R] Nginx HTTP 强制跳转到 HTTPS:\nif ($scheme = http) { rewrite ^(.*)$ https://$host$1 permanent; } 更推荐的写法是单独为 80 端口建一个 server 块,直接用 return,效率更高,也避免使用 if:\nserver { listen 80; server_name www.example.com; return 301 https://$host$request_uri; } 小结 rewrite 要注意 flag 的选择:地址栏需要变化用 redirect / permanent,不需要变化用 last / break。 if 不支持嵌套和多条件,复杂逻辑可以借助 set 变量拆分,或改用 location、map。 能用 return 解决的跳转,优先用 return,比 rewrite 更简洁高效。 ",
   "wordCount" : "890",
-  "inLanguage": "en",
+  "inLanguage": "zh",
   "datePublished": "2026-10-12T10:00:00Z",
   "dateModified": "2026-10-12T10:00:00Z",
   "mainEntityOfPage": {
@@ -162,8 +162,8 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/" title="首页">
-                    <span>首页</span>
+                <a href="http://localhost:1313/" title="主页">
+                    <span>主页</span>
                 </a>
             </li>
             <li>
@@ -204,7 +204,7 @@
 <article class="post-single">
   <header class="post-header">
     <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-            <a href="/">Home</a>
+            <a href="/">主页</a>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -223,7 +223,7 @@
     </div>
     <div class="post-meta">
 
-<span title='2026-10-12 10:00:00 +0000 UTC'>October 12, 2026</span>&nbsp;·&nbsp;<span>5 min</span>
+<span title='2026-10-12 10:00:00 +0000 UTC'>2026年10月12日</span>&nbsp;·&nbsp;<span>5 分钟</span>
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -1115,12 +1115,12 @@
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerHTML = 'copy';
+        copybutton.innerHTML = '复制';
 
         function copyingDone() {
-            copybutton.innerHTML = 'copied!';
+            copybutton.innerHTML = '已复制！';
             setTimeout(() => {
-                copybutton.innerHTML = 'copy';
+                copybutton.innerHTML = '复制';
             }, 2000);
         }
 

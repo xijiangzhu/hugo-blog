@@ -1,5 +1,6 @@
 baseURL: https://blog.lenhon.com/
-languageCode: zh-cn
+languageCode: zh-CN
+defaultContentLanguage: zh
 title: xijiangzhu's Blog
 theme:
   - PaperMod
@@ -12,7 +13,7 @@ outputs:
 
 menu:
   main:
-    - name: 首页
+    - name: 主页
       url: /
       weight: 5
     - name: 文章
@@ -50,16 +51,19 @@ params:
   ShowPageNums: true
   ShowToc: true
   TocOpen: true 
+  DateFormat: "2006年01月02日"
 
   homeInfoParams:
-    Title: "xijiangzhu"
-    Content: >
-      你好，欢迎来到我的技术博客！👋
+    #Title: "你好呀！！！"
+    Content: |
+      欢迎来到我的技术博客！👋
 
-      我是 xijiangzhu，一名热爱技术、乐于记录和分享的工程师。这里主要整理日常工作与学习中的实践经验，涵盖 Linux 运维、云原生、数据库、网络排障和自动化工具。
+      我是 xijiangzhu，一名热爱技术、乐于记录和分享的技术人。我在这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
+      
+      不求深刻，但求坦诚与持续。
 
       希望这些笔记能帮你少踩一些坑，也欢迎通过下方 GitHub 或邮箱交流。持续学习，持续记录。
-    avatar: /images/avatar.jpg
+    #avatar: /images/avatar.jpg
   socialIcons:
     - name: github
       title: Github
@@ -70,3 +74,6 @@ params:
 
   busuanzi:
     enable: true
+
+  fuseOpts:
+    threshold: 0.2

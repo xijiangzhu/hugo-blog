@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="auto" data-theme="auto">
+<html lang="zh" dir="auto" data-theme="auto">
 
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/">
+<link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/">
 <noscript>
     <style>
         #theme-toggle,
@@ -68,7 +68,7 @@
   <meta property="og:site_name" content="xijiangzhu&#39;s Blog">
   <meta property="og:title" content="etcd集群部署指南">
   <meta property="og:description" content="从零搭建高可用 etcd 集群，涵盖 cfssl 证书签发、节点配置、集群启动与健康检查，适用于 Kubernetes 控制平面基础设施部署。">
-  <meta property="og:locale" content="zh_cn">
+  <meta property="og:locale" content="zh_CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2026-10-12T16:57:10+00:00">
@@ -115,7 +115,7 @@
   ],
   "articleBody": "本文记录了在 Linux 环境下使用 cfssl 工具从零开始签发证书并部署高可用 etcd 集群的完整步骤。\n一、证书签发与配置 1. 安装 cfssl 工具 curl -s -L -o /usr/bin/cfssl https://pkg.cfssl.org/R1.2/cfssl_linux-amd64 curl -s -L -o /usr/bin/cfssljson https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64 curl -s -L -o /usr/bin/cfssl-certinfo https://pkg.cfssl.org/R1.2/cfssl-certinfo_linux-amd64 chmod +x /usr/bin/cfssl* 2. 签发 CA 证书 创建 CA 配置文件 ca-csr.json：\ncat \u003e ca-csr.json \u003c\u003c EOF { \"CN\": \"kubernetes-ca\", \"key\": { \"algo\": \"rsa\", \"size\": 2048 }, \"names\": [ { \"C\": \"CN\", \"ST\": \"GD\", \"L\": \"GZ\", \"O\": \"K8S\", \"OU\": \"OP\" } ], \"ca\": { \"expiry\": \"876000h\" } } EOF 生成 CA 证书：\ncfssl gencert -initca ca-csr.json | cfssljson -bare ca 3. 创建 CA 证书配置文件 创建 ca-config.json：\ncat \u003e ca-config.json \u003c\u003c EOF { \"signing\": { \"default\": { \"expiry\": \"876000h\" }, \"profiles\": { \"server\": { \"expiry\": \"876000h\", \"usages\": [ \"signing\", \"key encipherment\", \"server auth\" ] }, \"client\": { \"expiry\": \"876000h\", \"usages\": [ \"signing\", \"key encipherment\", \"client auth\" ] }, \"peer\": { \"expiry\": \"876000h\", \"usages\": [ \"signing\", \"key encipherment\", \"server auth\", \"client auth\" ] } } } } EOF 4. 签发 etcd 证书 创建 etcd 证书请求文件 etcd-peer-csr.json（请根据实际集群节点的 IP 地址进行修改）：\ncat \u003e etcd-peer-csr.json \u003c\u003c EOF { \"CN\": \"k8s-etcd\", \"hosts\": [ \"127.0.0.1\", \"192.168.19.100\", \"192.168.19.101\", \"192.168.19.102\", \"192.168.19.103\" ], \"key\": { \"algo\": \"rsa\", \"size\": 2048 }, \"names\": [ { \"C\": \"CN\", \"ST\": \"GD\", \"L\": \"GZ\", \"O\": \"K8S\", \"OU\": \"OP\" } ] } EOF 生成 etcd 证书：\ncfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=peer etcd-peer-csr.json | cfssljson -bare etcd-peer 注意：生成完成后，需要将 ca.pem、etcd-peer-key.pem、etcd-peer.pem 拷贝到其它节点的 /etc/etcd/ssl/ 目录下。\n二、部署 etcd 服务 1. 下载并安装 etcd curl -L https://github.com/coreos/etcd/releases/download/v3.5.1/etcd-v3.5.1-linux-amd64.tar.gz -o etcd-v3.5.1-linux-amd64.tar.gz tar xf etcd-v3.5.1-linux-amd64.tar.gz cp etcd* /usr/bin/ 2. 配置 etcd 系统服务 创建 systemd 服务文件 /usr/lib/systemd/system/etcd.service：\ncat \u003e /usr/lib/systemd/system/etcd.service \u003c\u003c EOF [Unit] Description=Etcd Server After=network.target After=network-online.target Wants=network-online.target [Service] Type=notify EnvironmentFile=/etc/etcd/etcd.conf ExecStart=/usr/bin/etcd \\ --cert-file=/etc/etcd/ssl/etcd-peer.pem \\ --key-file=/etc/etcd/ssl/etcd-peer-key.pem \\ --peer-cert-file=/etc/etcd/ssl/etcd-peer.pem \\ --peer-key-file=/etc/etcd/ssl/etcd-peer-key.pem \\ --trusted-ca-file=/etc/etcd/ssl/ca.pem \\ --peer-trusted-ca-file=/etc/etcd/ssl/ca.pem \\ --logger=zap Restart=on-failure RestartSec=5 LimitNOFILE=65535 [Install] WantedBy=multi-user.target EOF 3. 修改 etcd 配置文件 在 /etc/etcd/ 目录下创建配置文件 etcd.conf（注意修改各节点对应的 IP 与主机名）：\ncat \u003e etcd.conf \u003c",
   "wordCount" : "334",
-  "inLanguage": "en",
+  "inLanguage": "zh",
   "datePublished": "2026-10-12T16:57:10Z",
   "dateModified": "2026-10-12T16:57:10Z",
   "mainEntityOfPage": {
@@ -163,8 +163,8 @@
         </div>
         <ul id="menu" class="menu">
             <li>
-                <a href="http://localhost:1313/" title="首页">
-                    <span>首页</span>
+                <a href="http://localhost:1313/" title="主页">
+                    <span>主页</span>
                 </a>
             </li>
             <li>
@@ -205,7 +205,7 @@
 <article class="post-single">
   <header class="post-header">
     <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
-            <a href="/">Home</a>
+            <a href="/">主页</a>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -224,7 +224,7 @@
     </div>
     <div class="post-meta">
 
-<span title='2026-10-12 16:57:10 +0000 UTC'>October 12, 2026</span>&nbsp;·&nbsp;<span>2 min</span>
+<span title='2026-10-12 16:57:10 +0000 UTC'>2026年10月12日</span>&nbsp;·&nbsp;<span>2 分钟</span>
 
 </div>
   </header> <aside id="toc-container" class="toc-container wide">
@@ -698,12 +698,12 @@
 
         const copybutton = document.createElement('button');
         copybutton.classList.add('copy-code');
-        copybutton.innerHTML = 'copy';
+        copybutton.innerHTML = '复制';
 
         function copyingDone() {
-            copybutton.innerHTML = 'copied!';
+            copybutton.innerHTML = '已复制！';
             setTimeout(() => {
-                copybutton.innerHTML = 'copy';
+                copybutton.innerHTML = '复制';
             }, 2000);
         }
 
