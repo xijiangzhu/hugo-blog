@@ -1,7 +1,7 @@
 baseURL: https://blog.lenhon.com/
 languageCode: zh-CN
 defaultContentLanguage: zh
-title: xijiangzhu 的技术博客
+title: xijiangzhu's Blog
 theme:
   - PaperMod
 
@@ -72,11 +72,11 @@ params:
     Content: |
       欢迎来到我的技术博客！👋
 
-      我是一个热爱技术、乐于记录和分享的技术人。
+      - 一个热爱技术、乐于记录和分享的技术人。
 
-      在这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
+      - 这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
       
-      不求深刻，但求坦诚与持续。
+      - 不求深刻，但求坦诚与持续。
     #avatar: /images/avatar.jpg
   socialIcons:
     - name: github
