@@ -1,7 +1,9 @@
 ---
 title: "关于本站"
+description: "了解 xijiangzhu 和这个技术博客，包含博客内容方向、写作初衷与联系方式。"
 date: 2026-10-15T10:00:00+08:00
 draft: false
+ShowToc: false
 ---
 
 

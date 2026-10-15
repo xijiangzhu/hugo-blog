@@ -1,0 +1,21 @@
+{{- with site.Params.giscus }}
+    {{- if and .repo .repoId .category .categoryId }}
+<section class="giscus-comments" aria-label="文章评论">
+    <script src="https://giscus.app/client.js"
+        data-repo="{{ .repo }}"
+        data-repo-id="{{ .repoId }}"
+        data-category="{{ .category }}"
+        data-category-id="{{ .categoryId }}"
+        data-mapping="{{ .mapping | default "pathname" }}"
+        data-strict="0"
+        data-reactions-enabled="{{ .reactionsEnabled | default "1" }}"
+        data-emit-metadata="{{ .emitMetadata | default "0" }}"
+        data-input-position="{{ .inputPosition | default "bottom" }}"
+        data-theme="{{ .theme | default "preferred_color_scheme" }}"
+        data-lang="{{ .lang | default "zh-CN" }}"
+        crossorigin="anonymous"
+        async>
+    </script>
+</section>
+    {{- end }}
+{{- end }}

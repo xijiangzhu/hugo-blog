@@ -1,9 +1,14 @@
 baseURL: https://blog.lenhon.com/
 languageCode: zh-CN
 defaultContentLanguage: zh
-title: xijiangzhu's Blog
+title: xijiangzhu 的技术博客
 theme:
   - PaperMod
+
+enableRobotsTXT: true
+
+pagination:
+  pagerSize: 5
 
 outputs:
   home:
@@ -41,6 +46,15 @@ menu:
 
 params:
   env: production
+  author: xijiangzhu
+  description: >-
+    xijiangzhu 的技术博客，记录 Linux 运维、云原生、数据库、网络排障与自动化实践，分享工作中的技术经验和学习笔记。
+  images:
+    - /images/avatar.jpg
+  schema:
+    publisherType: Person
+    sameAs:
+      - https://github.com/xijiangzhu
   defaultTheme: auto
   ShowShareButtons: true
   ShowReadingTime: true
@@ -54,15 +68,15 @@ params:
   DateFormat: "2006年01月02日"
 
   homeInfoParams:
-    #Title: "你好呀！！！"
+    Title: "你好呀 ！(*￣▽￣*)ブ"
     Content: |
       欢迎来到我的技术博客！👋
 
-      我是 xijiangzhu，一名热爱技术、乐于记录和分享的技术人。我在这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
+      我是一个热爱技术、乐于记录和分享的技术人。
+
+      在这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
       
       不求深刻，但求坦诚与持续。
-
-      希望这些笔记能帮你少踩一些坑，也欢迎通过下方 GitHub 或邮箱交流。持续学习，持续记录。
     #avatar: /images/avatar.jpg
   socialIcons:
     - name: github
@@ -77,3 +91,16 @@ params:
 
   fuseOpts:
     threshold: 0.2
+
+  comments: true
+  giscus:
+    repo: xijiangzhu/hugo-blog
+    repoId: "R_kgDOVKh0Uw"
+    category: General
+    categoryId: "DIC_kwDOVKh0U84DIfVj"
+    mapping: pathname
+    reactionsEnabled: "1"
+    emitMetadata: "0"
+    inputPosition: bottom
+    theme: preferred_color_scheme
+    lang: zh-CN

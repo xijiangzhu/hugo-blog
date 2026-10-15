@@ -1,0 +1,10 @@
+# Hugo generated resource cache
+/resources/
+/.hugo_build.lock
+/public/
+
+# Editor and operating system files
+/.DS_Store
+/Thumbs.db
+*.swp
+*.swo

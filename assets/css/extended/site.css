@@ -22,7 +22,7 @@
 }
 
 .home-info .entry-content p:first-child {
-    margin-top: 0;
+    margin-top: 0.75rem;
 }
 
 .menu-search-icon {
@@ -48,6 +48,10 @@
     padding: 0.5rem 1rem 1rem;
     color: var(--secondary);
     font-size: 0.85rem;
+}
+
+.giscus-comments {
+    margin-top: 2rem;
 }
 
 @media (max-width: 600px) {
