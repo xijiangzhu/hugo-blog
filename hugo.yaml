@@ -58,6 +58,7 @@ params:
   defaultTheme: auto
   ShowShareButtons: true
   ShowReadingTime: true
+  ShowWordCount: true
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
   ShowRssButtonInSectionTermList: true
