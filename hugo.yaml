@@ -8,7 +8,7 @@ theme:
 enableRobotsTXT: true
 
 pagination:
-  pagerSize: 5
+  pagerSize: 10
 
 outputs:
   home:
@@ -68,9 +68,9 @@ params:
   DateFormat: "2006年01月02日"
 
   homeInfoParams:
-    Title: "你好呀 ！(*￣▽￣*)ブ"
+    Title: "👋你好呀 ！(*￣▽￣*)ブ "
     Content: |
-      欢迎来到我的技术博客！👋
+      Welcome to my Blog !
 
       - 一个热爱技术、乐于记录和分享的技术人。
 
