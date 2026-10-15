@@ -1,0 +1,72 @@
+baseURL: https://blog.lenhon.com/
+languageCode: zh-cn
+title: xijiangzhu's Blog
+theme:
+  - PaperMod
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+menu:
+  main:
+    - name: 首页
+      url: /
+      weight: 5
+    - name: 文章
+      url: posts/
+      weight: 10
+    - name: 归档
+      url: archives/
+      weight: 15
+    - name: 分类
+      url: categories/
+      weight: 20
+    - name: 标签
+      url: tags/
+      weight: 25
+    - name: 搜索
+      identifier: search
+      title: 搜索
+      pre: >-
+        <svg class="menu-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      url: search/
+      weight: 99
+    - name: 关于
+      url: about/
+      weight: 30
+
+params:
+  env: production
+  defaultTheme: auto
+  ShowShareButtons: true
+  ShowReadingTime: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  TocOpen: true 
+
+  homeInfoParams:
+    Title: "xijiangzhu"
+    Content: >
+      你好，欢迎来到我的技术博客！👋
+
+      我是 xijiangzhu，一名热爱技术、乐于记录和分享的工程师。这里主要整理日常工作与学习中的实践经验，涵盖 Linux 运维、云原生、数据库、网络排障和自动化工具。
+
+      希望这些笔记能帮你少踩一些坑，也欢迎通过下方 GitHub 或邮箱交流。持续学习，持续记录。
+    avatar: /images/avatar.jpg
+  socialIcons:
+    - name: github
+      title: Github
+      url: "https://github.com/xijiangzhu"
+    - name: email
+      title: 发送邮件
+      url: "mailto:xijiangzhu@gmail.com"
+
+  busuanzi:
+    enable: true

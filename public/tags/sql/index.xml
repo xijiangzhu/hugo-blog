@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>SQL on xijiangzhu&#39;s Blog</title>
+    <link>http://localhost:1313/tags/sql/</link>
+    <description>Recent content in SQL on xijiangzhu&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 12 Oct 2026 10:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/sql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MySQL常用语法速查</title>
+      <link>http://localhost:1313/posts/mysql%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5/</link>
+      <pubDate>Mon, 12 Oct 2026 10:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/mysql%E5%B8%B8%E7%94%A8%E8%AF%AD%E6%B3%95%E9%80%9F%E6%9F%A5/</guid>
+      <description>整理 MySQL 常用语法:数据库、表、表结构、索引、视图、常用函数、存储过程与触发器的创建、查看、修改和删除。</description>
+    </item>
+  </channel>
+</rss>

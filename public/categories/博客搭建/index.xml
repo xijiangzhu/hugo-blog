@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>博客搭建 on xijiangzhu&#39;s Blog</title>
+    <link>http://localhost:1313/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link>
+    <description>Recent content in 博客搭建 on xijiangzhu&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 12 Oct 2026 10:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hexo安装和使用</title>
+      <link>http://localhost:1313/posts/hexo%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Mon, 12 Oct 2026 10:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/hexo%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
+      <description>从零开始安装 Hexo,配置 NexT 主题,并整理常用命令与常见问题。</description>
+    </item>
+  </channel>
+</rss>
