@@ -3,13 +3,8 @@ title: Docker Compose搭建Nginx+PHP+MySQL环境
 date: 2026-10-12 10:00:00
 tags:
   - Docker
-  - Docker Compose
-  - Nginx
-  - PHP
-  - MySQL
 categories:
-  - 技术
-  - 运维
+  - 容器
 description: 使用 Docker Compose 编排 Nginx、PHP-FPM 和 MySQL 三个容器,包括镜像选择、Dockerfile、目录结构、compose 配置、启动停止以及 PHP 连接 MySQL 的验证。
 ---
 

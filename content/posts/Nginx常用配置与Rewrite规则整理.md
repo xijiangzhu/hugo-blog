@@ -3,11 +3,8 @@ title: Nginx常用配置与Rewrite规则整理
 date: 2026-10-12 10:00:00
 tags:
   - Nginx
-  - Rewrite
-  - 运维
 categories:
-  - 技术
-  - 运维
+  - Linux
 description: 整理 Nginx 常用的正则匹配、rewrite 指令、全局变量,以及防盗链、域名跳转、HTTPS 跳转等常见配置实例。
 ---
 

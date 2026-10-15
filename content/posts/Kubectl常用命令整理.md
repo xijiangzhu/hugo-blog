@@ -3,11 +3,8 @@ title: Kubectl常用命令整理
 date: 2026-10-12 10:00:00
 tags:
   - Kubernetes
-  - kubectl
-  - 运维
 categories:
-  - 技术
-  - 运维
+  - K8S
 description: 整理 kubectl 日常使用的常用命令:查看、删除、日志、创建与更新资源、伸缩、调试、标签、文件拷贝、节点维护与滚动更新回滚。
 ---
 

@@ -3,11 +3,8 @@ title: KVM常用操作整理
 date: 2026-10-12 10:00:00
 tags:
   - KVM
-  - 虚拟化
-  - libvirt
 categories:
-  - 技术
-  - 运维
+  - Linux
 description: 整理 KVM 虚拟化的日常操作:桥接网络配置、创建与导入虚拟机、磁盘格式转换与压缩、克隆、静态与热迁移、磁盘扩容、console 卡住的解决办法。
 ---
 

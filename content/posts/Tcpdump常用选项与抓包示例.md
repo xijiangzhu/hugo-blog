@@ -3,11 +3,8 @@ title: Tcpdump常用选项与抓包示例
 date: 2026-10-12 10:00:00
 tags:
   - tcpdump
-  - 抓包
-  - 网络
 categories:
-  - 技术
-  - 运维
+  - Linux
 description: 整理 tcpdump 的常用选项,以及抓取 MySQL、HTTP 数据包的实例和过滤表达式说明。
 ---
 

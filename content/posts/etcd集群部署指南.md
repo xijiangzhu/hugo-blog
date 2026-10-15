@@ -3,11 +3,8 @@ title: etcd集群部署指南
 date: 2026-10-12 16:57:10
 tags:
   - Kubernetes
-  - etcd
-  - Linux
-  - 运维
 categories:
-  - 云原生
+  - K8S
 description: 从零搭建高可用 etcd 集群，涵盖 cfssl 证书签发、节点配置、集群启动与健康检查，适用于 Kubernetes 控制平面基础设施部署。
 ---
 

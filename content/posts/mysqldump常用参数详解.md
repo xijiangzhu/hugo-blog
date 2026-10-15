@@ -3,10 +3,7 @@ title: mysqldump常用参数详解
 date: 2026-10-12 10:00:00
 tags:
   - MySQL
-  - mysqldump
-  - 备份
 categories:
-  - 技术
   - 数据库
 description: 按功能分类整理 mysqldump 的常用参数,包括连接、导出范围、导出对象、锁与一致性、输出格式等,并附常用备份与恢复命令。
 ---

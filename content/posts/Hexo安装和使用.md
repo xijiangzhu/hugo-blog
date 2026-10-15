@@ -3,11 +3,6 @@ title: Hexo安装和使用
 date: 2026-10-12 10:00:00
 tags:
   - Hexo
-  - NexT
-  - 教程
-categories:
-  - 技术
-  - 博客搭建
 description: 从零开始安装 Hexo,配置 NexT 主题,并整理常用命令与常见问题。
 ---
 

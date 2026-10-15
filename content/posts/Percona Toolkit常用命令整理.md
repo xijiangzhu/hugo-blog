@@ -3,10 +3,7 @@ title: Percona Toolkit 常用命令整理
 date: 2026-10-12 10:00:00
 tags:
   - MySQL
-  - Percona Toolkit
-  - 运维
 categories:
-  - 技术
   - 数据库
 description: 整理 Percona Toolkit 中常用的工具用法:在线改表、主从数据校验与修复、数据归档、慢查询杀死与分析、重复索引检查。
 ---

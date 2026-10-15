@@ -3,10 +3,7 @@ title: MySQL常用语法速查
 date: 2026-10-12 10:00:00
 tags:
   - MySQL
-  - SQL
-  - 数据库
 categories:
-  - 技术
   - 数据库
 description: 整理 MySQL 常用语法:数据库、表、表结构、索引、视图、常用函数、存储过程与触发器的创建、查看、修改和删除。
 ---
