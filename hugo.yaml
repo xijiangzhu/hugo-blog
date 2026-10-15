@@ -96,7 +96,7 @@ params:
   giscus:
     repo: xijiangzhu/hugo-blog
     repoId: "R_kgDOVKh0Uw"
-    category: General
+    category: Announcements
     categoryId: "DIC_kwDOVKh0U84DIfVj"
     mapping: pathname
     reactionsEnabled: "1"
