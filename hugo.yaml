@@ -85,6 +85,9 @@ params:
     - name: email
       title: 发送邮件
       url: "mailto:xijiangzhu@gmail.com"
+    - name: rss
+      title: RSS 订阅
+      url: /index.xml
 
   busuanzi:
     enable: true
