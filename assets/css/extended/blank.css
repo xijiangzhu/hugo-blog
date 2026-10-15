@@ -1,6 +1,36 @@
 :root {
-    --article-width: 650px;
-    --toc-width: 300px;
+    --nav-width: 1120px;
+    --main-width: 1080px;
+    --article-width: 796px;
+    --toc-width: 260px;
+}
+
+@media (min-width: 1201px) {
+    main.main:has(.post-single) {
+        max-width: calc(var(--article-width) + var(--toc-width) + var(--gap) * 3);
+    }
+
+    .post-single {
+        position: relative;
+    }
+
+    .post-single > .post-header,
+    .post-single > .post-content,
+    .post-single > .post-footer,
+    .post-single > .entry-cover {
+        max-width: var(--article-width);
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 1200px) {
+    .post-single > .post-header,
+    .post-single > .post-content,
+    .post-single > .post-footer,
+    .post-single > .entry-cover {
+        max-width: 100%;
+    }
 }
 
 .toc {
@@ -14,15 +44,17 @@
 .toc-container.wide {
     position: absolute;
     height: 100%;
-    border-right: 1px solid var(--border);
-    left: calc((var(--toc-width) + var(--gap)) * -1);
+    border-right: 0;
+    border-left: 1px solid var(--border);
+    left: auto;
+    right: 0;
     top: calc(var(--gap) * 2);
     width: var(--toc-width);
 }
 
 .wide .toc {
     position: sticky;
-    top: var(--gap);
+    top: calc(var(--header-height) + var(--gap));
     border: unset;
     background: unset;
     border-radius: unset;
