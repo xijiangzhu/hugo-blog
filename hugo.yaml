@@ -47,6 +47,8 @@ menu:
 params:
   env: production
   author: xijiangzhu
+  assets:
+    favicon: "/favicon.svg"
   description: >-
     xijiangzhu 的技术博客，记录 Linux 运维、云原生、数据库、网络排障与自动化实践，分享工作中的技术经验和学习笔记。
   images:
