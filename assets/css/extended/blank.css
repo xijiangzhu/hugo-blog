@@ -1,8 +1,8 @@
 :root {
-    --nav-width: 1120px;
+    --nav-width: 1080px;
     --main-width: 1080px;
-    --article-width: 796px;
-    --toc-width: 260px;
+    --article-width: 836px;
+    --toc-width: 220px;
 }
 
 @media (min-width: 1201px) {
@@ -17,7 +17,8 @@
     .post-single > .post-header,
     .post-single > .post-content,
     .post-single > .post-footer,
-    .post-single > .entry-cover {
+    .post-single > .entry-cover,
+    .post-single > .giscus-comments {
         max-width: var(--article-width);
         margin-left: 0;
         margin-right: 0;
@@ -28,7 +29,8 @@
     .post-single > .post-header,
     .post-single > .post-content,
     .post-single > .post-footer,
-    .post-single > .entry-cover {
+    .post-single > .entry-cover,
+    .post-single > .giscus-comments {
         max-width: 100%;
     }
 }
@@ -44,17 +46,15 @@
 .toc-container.wide {
     position: absolute;
     height: 100%;
-    border-right: 0;
     border-left: 1px solid var(--border);
-    left: auto;
     right: 0;
-    top: calc(var(--gap) * 2);
+    top: 0;
     width: var(--toc-width);
 }
 
 .wide .toc {
     position: sticky;
-    top: calc(var(--header-height) + var(--gap));
+    top: calc(var(--header-height) + var(--gap) * 0.5);
     border: unset;
     background: unset;
     border-radius: unset;
@@ -66,6 +66,7 @@
     cursor: zoom-in;
     margin-inline-start: 20px;
     padding: 12px 0;
+    font-size: 0.85rem;
 }
 
 .toc details[open] summary {
@@ -81,14 +82,10 @@
     font-weight: 600;
 }
 
-.toc ul {
-    list-style-type: circle;
-}
-
 .toc .inner {
     margin: 0 0 0 20px;
     padding: 0px 15px 15px 20px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .toc li ul {
@@ -98,7 +95,7 @@
 
 .toc li {
     list-style: none;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     padding-bottom: 5px;
 }
 

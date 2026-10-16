@@ -71,11 +71,9 @@ params:
   homeInfoParams:
     Title: "👋你好呀 ！(*￣▽￣*)ブ "
     Content: |
-      Welcome to my Blog !
+      Welcome to my blog!
 
-      - 一个热爱技术、乐于记录和分享的技术人。
-
-      - 这里记录工作中的技术沉淀、随想思考，以及一些琐碎而真实的日常。
+      - 一个热爱技术、乐于记录与分享的人。
       
       - 不求深刻，但求坦诚与持续。
     #avatar: /images/avatar.jpg
