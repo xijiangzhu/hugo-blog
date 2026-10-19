@@ -71,9 +71,9 @@ params:
   DateFormat: "2006年01月02日"
 
   homeInfoParams:
-    Title: "👋你好呀 ！(*￣▽￣*)ブ "
+    #Title: "👋你好呀 ！(*￣▽￣*)ブ "
     Content: |
-      Welcome to my blog!
+      👋 Welcome to my blog! ✨
 
       - 一个热爱技术、乐于记录与分享的人。
       
