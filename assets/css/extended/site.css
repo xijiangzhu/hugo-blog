@@ -14,11 +14,45 @@ html[data-theme="light"] {
     --primary: #172033;
     --content: #172033;
     --secondary: #7b8495;
+    --tertiary: #d7e2f4;
+    --border: #e6ecf5;
+    --code-bg: #f2f5fa;
 }
 
 html[data-theme="light"] .post-entry:hover,
 html[data-theme="light"] .post-entry:focus-within {
     border-color: #cbd9ff;
+    box-shadow: 0 10px 28px rgba(35, 75, 160, 0.07);
+}
+
+.post-entry {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.entry-header h2,
+.post-title {
+    letter-spacing: -0.02em;
+}
+
+.post-meta {
+    font-size: 13px;
+}
+
+.toc-container.wide {
+    border-left-color: var(--border);
+}
+
+.toc-container.wide .toc li {
+    font-size: 0.82rem;
+}
+
+.toc-container.wide .toc li a {
+    color: var(--secondary);
+}
+
+.toc-container.wide .toc li a:hover,
+.toc-container.wide .toc li a.active {
+    color: #2b55f5;
 }
 
 .home-info {
