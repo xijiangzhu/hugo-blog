@@ -1,3 +1,9 @@
+.social-icons a[href^="https://github.com"],
+.social-icons a[href^="mailto:"],
+.social-icons a[href$="/index.xml"] {
+    color: #2b55f5;
+}
+
 .home-info {
     display: flex;
     align-items: flex-start;
