@@ -55,6 +55,10 @@ html[data-theme="light"] .post-entry:focus-within {
     color: #2b55f5;
 }
 
+html[data-theme="light"] .menu .active {
+    color: #2b55f5;
+}
+
 .home-info {
     display: flex;
     align-items: flex-start;
