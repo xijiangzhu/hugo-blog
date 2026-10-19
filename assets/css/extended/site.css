@@ -4,6 +4,23 @@
     color: #2b55f5;
 }
 
+html[data-theme="light"] body {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(72, 126, 255, .09), transparent 42%),
+        #f8fafc;
+}
+
+html[data-theme="light"] {
+    --primary: #172033;
+    --content: #172033;
+    --secondary: #7b8495;
+}
+
+html[data-theme="light"] .post-entry:hover,
+html[data-theme="light"] .post-entry:focus-within {
+    border-color: #cbd9ff;
+}
+
 .home-info {
     display: flex;
     align-items: flex-start;
@@ -64,12 +81,21 @@
 
 @media (max-width: 600px) {
     .home-info {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         gap: 1rem;
     }
 
+    .home-info-avatar {
+        flex-basis: 72px;
+    }
+
+    .home-info-avatar img {
+        width: 72px;
+        height: 72px;
+    }
+
     .home-info-body {
-        width: 100%;
+        flex: 1;
     }
 }
